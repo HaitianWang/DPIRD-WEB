@@ -34,29 +34,35 @@
       }
     },
     methods: {
-      login(data){
-        let param = new FormData(); // 创建 form 对象
+      login(data) {
+        console.log("Attempting login with:", this.username, this.pwd);
+        let param = new FormData();
         param.append("username", this.username);
         param.append("pwd", this.pwd);
         let config = {
           headers: { "Content-Type": "multipart/form-data" },
-        }; // 添加请求头
+        };
         axios
           .post(this.server_url + "/login", param, config)
           .then((response) => {
-            console.log(response.data)
-            if(response.data=='1'){
+            console.log("Login response:", response.data);
+            if (response.data.status === "1") {
+              console.log("Login successful");
               this.$router.replace({
                 path: "/mainPage",
                 name: 'mainPage',
                 query: {
-                  username:this.username
+                  username: this.username
                 }
               });
+            } else {
+              console.log("Login failed");
+              window.alert(response.data.message || "Username or password error");
             }
-            else {
-              window.alert("username or password error")
-            }
+          })
+          .catch((error) => {
+            console.error("Login error:", error);
+            window.alert("An error occurred during login");
           });
       },
       goRegister(){
