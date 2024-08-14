@@ -13,6 +13,7 @@ import numpy as np
 import io
 from PIL import Image
 import uuid
+import matplotlib
 
 def c_main(path, model):
     X, spectrum_names = process.pre_process(path)
@@ -22,6 +23,7 @@ def c_main(path, model):
    
     print("Normalizing input images")
     X = X / np.max(X)
+    matplotlib.use('Agg')
 
     def save_image(img, title):
         plt.figure(figsize=(5, 5))
