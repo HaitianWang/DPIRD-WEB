@@ -171,6 +171,7 @@ yarn-error.log
 .env.test.local
 .env.production.local
 .env.local
+.venv
 *.h5
 *.db
 *.zip
