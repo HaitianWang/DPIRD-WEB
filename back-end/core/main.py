@@ -15,6 +15,7 @@ from PIL import Image
 import uuid
 import matplotlib
 
+
 def c_main(path, model):
     X, spectrum_names = process.pre_process(path)
     print(f'Number of images: {X.shape[0]}')
