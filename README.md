@@ -21,3 +21,7 @@ npm run dev
 ## Inference:
 
 Currently, a `smalldata_X_Y` file must be zipped and used as data to be analysed.
+
+## Python
+
+Python version used was 3.9.*
