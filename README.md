@@ -17,3 +17,7 @@ terminal命令（先进入front-end文件夹）：：
 npm install之后会自动出现node_modules文件夹，注意这一步有报错是非常正常的
 
 npm run dev
+
+## Inference:
+
+Currently, a `smalldata_X_Y` file must be zipped and used as data to be analysed.
