@@ -35,8 +35,7 @@
               <span style="color: white">Input Spectrum: {{ currentImageName }}</span>
             </div>
             <div class="image-navigation">
-              <el-button @click="previousImage" :disabled="currentImageIndex === 0">Previous</el-button>
-              <el-button @click="nextImage" :disabled="currentImageIndex === allImageUrls.length - 1">Next</el-button>
+             
             </div>
           </div>
           <div class="demo-image__preview2">
