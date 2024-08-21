@@ -175,3 +175,6 @@ yarn-error.log
 *.h5
 *.db
 *.zip
+
+# Test Data
+2021Test/
