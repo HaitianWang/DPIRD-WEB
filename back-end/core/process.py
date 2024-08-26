@@ -21,10 +21,15 @@ if gpus:
 else:
     print("No GPUs available. Check your CUDA and cuDNN installation.")
 
-def load_tif(file_path):
+def load_tif(file_path, is_rgb=False):
     print(f"Loading TIF file from {file_path}")
     with rasterio.open(file_path) as src:
-        image = src.read(1).astype(np.float32)
+        if is_rgb:
+            # Read all three channels for an RGB image
+            image = np.dstack([src.read(i) for i in range(1, 4)]).astype(np.float32)
+        else:
+            # Read only the first channel for other types of images
+            image = src.read(1).astype(np.float32)
     
     # Check for NaN values
     if np.isnan(image).any():
@@ -35,9 +40,14 @@ def load_tif(file_path):
     min_val = np.min(image)
     max_val = np.max(image)
     
+    if is_rgb:
+        print(f"Loading RGB image from {file_path}")
+        # Normalize RGB to [0, 1] range
+        image = (image - min_val) / (max_val - min_val)
+        return image
+    
     if min_val < 0 or max_val > 1:
         print(f"Scaling applied to {file_path}")
-        
         # Apply min-max scaling
         image = (image - min_val) / (max_val - min_val)
     else:
@@ -45,7 +55,6 @@ def load_tif(file_path):
         print(f"Data range: [{min_val}, {max_val}]")
     
     return image
-
 
 def create_dataset(base_path):
     inputs = []
@@ -65,12 +74,17 @@ def create_dataset(base_path):
                     if matching_files:
                         file_path = os.path.join(dir_path, matching_files[0])
                         print(f"Found file for {index}: {file_path}")
-                        data = load_tif(file_path)
-                        dataset_images[index] = data
-
-                        # If this is the RGB image, store the original data
+                        # Use is_rgb=True for RGB images
+                        data = load_tif(file_path, is_rgb=(index == 'RGB'))
+                        
+                        # Ensure all images have the same shape
                         if index == 'RGB':
+                            # For RGB, use the first channel
+                            dataset_images[index] = data[:,:,0]
+                            # Store the full RGB image
                             original_rgb_images.append(data)
+                        else:
+                            dataset_images[index] = data
                     else:
                         print(f"Missing file for index {index} in directory {dir_path}")
                         missing_indices.append(index)
@@ -79,10 +93,10 @@ def create_dataset(base_path):
                 if len(missing_indices) == 0:
                     # Stack the images in the correct order as per SPECTRAL_INDICES
                     input_stack = np.stack([dataset_images[index] for index in SPECTRAL_INDICES], axis=-1)
-                    if input_stack.shape[-1] == 14:  # Ensure correct number of channels (14 expected)
+                    if input_stack.shape[-1] == len(SPECTRAL_INDICES):  # Ensure correct number of channels
                         inputs.append(input_stack)
                     else:
-                        print(f"Warning: Unexpected number of channels: {input_stack.shape[-1]}. Expected 14.")
+                        print(f"Warning: Unexpected number of channels: {input_stack.shape[-1]}. Expected {len(SPECTRAL_INDICES)}.")
                 else:
                     print(f"Skipping folder {dir_path} due to missing indices: {missing_indices}")
     

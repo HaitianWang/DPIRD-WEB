@@ -1,4 +1,5 @@
 from flask import Blueprint, jsonify, request, make_response, send_from_directory, current_app
+from flask_cors import cross_origin
 from werkzeug.utils import secure_filename
 import os
 import shutil
@@ -7,8 +8,11 @@ import core.main
 
 file_ops_bp = Blueprint('file_ops', __name__)
 
-@file_ops_bp.route('/upload', methods=['POST'])
+@file_ops_bp.route('/upload', methods=['POST', 'OPTIONS'])
+@cross_origin(origins="*", methods=['POST', 'OPTIONS'], allow_headers=['Content-Type'])
 def upload_file():
+    if request.method == 'OPTIONS':
+        return '', 204
     file = request.files['file']
     print(datetime.datetime.now(), file.filename)
     if file and allowed_file(file.filename):

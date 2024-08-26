@@ -1,19 +1,20 @@
 from core import process
-from sklearn.model_selection import train_test_split
-from tensorflow.keras.utils import to_categorical
-from tensorflow.keras.applications.inception_v3 import InceptionV3
-from tensorflow.keras.layers import Conv2D, UpSampling2D, concatenate, Input, BatchNormalization, Layer
-from tensorflow.keras.models import Model
+import os
 import numpy as np
-import pandas as pd
+import matplotlib.pyplot as plt
 import rasterio
 import tensorflow as tf
-import matplotlib.pyplot as plt
-import numpy as np
+import matplotlib.colors as mcolors
 import io
 from PIL import Image
 import uuid
 import matplotlib
+from sklearn.model_selection import train_test_split
+from tensorflow.keras.layers import Conv2D, Input
+from tensorflow.keras.models import Model
+
+# Assuming process is an external module that you import
+# from core import process
 
 def reduce_channels(X, channels_to_keep=13):
     """
@@ -29,33 +30,57 @@ def reduce_channels(X, channels_to_keep=13):
     """
     return X[:, :, :, 1:]
 
-def convert_tif_to_rgb(image):
+from PIL import Image
+import numpy as np
+import io
+import matplotlib.pyplot as plt
+
+import rasterio
+import numpy as np
+
+def convert_array_to_rgb(image_array):
     """
-    Convert TIF image color values to the range [0, 255] for RGB display.
-    
+    Convert a numpy array from a normalized RGB image to an 8-bit RGB image.
+   
     Parameters:
-    image (numpy array): The input TIF image with shape (height, width, 3).
-    
+    image_array (numpy.ndarray): The input image array (normalized to [0, 1]).
+   
     Returns:
-    numpy array: The image converted to uint8 with values in the range [0, 255].
+    numpy.ndarray: The image converted to RGB with values in the range [0, 255].
     """
-    if image.shape[-1] != 3:
-        raise ValueError("Input image must have 3 channels for RGB conversion.")
+    # Ensure the array is 3D
+    if image_array.ndim == 2:
+        # If it's a 2D array, replicate it to 3 channels
+        image_array = np.stack((image_array,) * 3, axis=-1)
+    elif image_array.ndim > 3:
+        # If it has more than 3 dimensions, take the first 3 channels
+        image_array = image_array[:, :, :3]
+   
+    # Convert to 8-bit (0-255 range)
+    rgb_array = (image_array * 255).astype(np.uint8)
+   
+    return rgb_array
 
-    scaled_image = np.zeros_like(image, dtype=np.uint8)
-    
-    for i in range(3):  # Assuming the channels are ordered as Red, Green, Blue
-        channel = image[:, :, i]
-        min_val = np.min(channel)
-        max_val = np.max(channel)
+import matplotlib.pyplot as plt
+import io
+from PIL import Image
 
-        if max_val > min_val:
-            scaled_image[:, :, i] = ((channel - min_val) / (max_val - min_val) * 255).astype(np.uint8)
-        else:
-            scaled_image[:, :, i] = np.zeros_like(channel, dtype=np.uint8)  # Handle edge case where the channel is uniform
-
-    return scaled_image
-
+def save_image(img_array, title, cmap=None):
+    plt.figure(figsize=(5, 5))
+   
+    if cmap is None:
+        rgb_img = convert_array_to_rgb(img_array)
+        plt.imshow(rgb_img)
+    else:
+        plt.imshow(img_array, cmap=cmap)
+   
+    plt.title(title)
+    plt.axis('off')
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png')
+    plt.close()
+    buf.seek(0)
+    return Image.open(buf)
 
 def c_main(path, model):
     # Preprocess the data and get the input images and original RGB images
@@ -72,29 +97,6 @@ def c_main(path, model):
 
     matplotlib.use('Agg')
     
-    # Function to save images
-    def save_image(img, title, cmap=None):
-        """
-        Save the image with the appropriate colormap. 
-        If cmap is None and the image has 3 channels, it assumes the image is RGB and uses the default colors.
-        """
-        plt.figure(figsize=(5, 5))
-        
-        if cmap is None and img.shape[-1] == 3:
-            # For RGB images, convert TIF color values to the range [0, 255]
-            img = convert_tif_to_rgb(img)
-            plt.imshow(img)
-        else:
-            plt.imshow(img, cmap=cmap)
-        
-        plt.title(title)
-        plt.axis('off')
-        buf = io.BytesIO()
-        plt.savefig(buf, format='png')
-        plt.close()
-        buf.seek(0)
-        return Image.open(buf)
-
     print("Predicting on validation set")
     y_pred = model.predict(X)
 
@@ -120,5 +122,7 @@ def c_main(path, model):
         'input_shape': X.shape,
         'prediction_shape': y_pred.shape,
     }
+    
+    print(f"Original RGB image shape: {original_rgb_images[0].shape}, dtype: {original_rgb_images[0].dtype}")
 
     return pid, input_images, predicted_mask, image_info, ['RGB']

@@ -1,97 +1,104 @@
 <template>
-  <div id="Content">
+  <div id="Content" style="display: flex; flex-direction: column; align-items: center;">
+    <!-- How to Use Section -->
+    <el-card class="how-to-use" style="margin-bottom: 20px; width: 100%;">
+      <div slot="header">
+        <h3>How to Use</h3>
+      </div>
+      <p>Upload a zip file containing TIF image documents with the following vegetation index spectrums:</p>
+      <p class="spectrum-list">
+        CI, EVI, ExG, ExR, GNDVI, MCARI, MGRVI, MSAVI, NDVI, OSAVI, PRI, SAVI, TVI
+      </p>
+    </el-card>
 
+    <!-- Existing Dialog -->
     <el-dialog title="AI Prediction in Progress" :visible.sync="dialogTableVisible" :show-close="false"
       :close-on-press-escape="false" :append-to-body="true" :close-on-click-modal="false" :center="true">
       <el-progress :percentage="percentage"></el-progress>
       <span slot="footer" class="dialog-footer">Please wait patiently for about 3 seconds</span>
     </el-dialog>
 
-    <div id="CT">
-      <div id="CT_image">
-        <el-card id="CT_image_1" class="box-card" style="
+   <!-- CT Images Section -->
+   <div id="CT" style="width: 100%; margin-bottom: 20px;">
+      <el-card id="CT_image_1" class="box-card" style="
             border-radius: 8px;
-            width: 800px;
-            height: 450px;
-            margin-bottom: -60px;
+            width: 100%;
+            margin-bottom: 20px;
           ">
-          <div class="demo-image__preview1">
-            <div v-loading="loading" element-loading-text="Uploading Image" element-loading-spinner="el-icon-loading">
-              <el-image :src="currentImageUrl" class="image_1" :preview-src-list="allImageUrls"
-                style="border-radius: 3px 3px 0 0">
-                <div slot="error">
-                  <div slot="placeholder" class="error">
-                    <el-button v-show="showbutton" type="primary" icon="el-icon-upload" class="download_bt"
-                      v-on:click="true_upload">
-                      Upload Zip
-                      <input ref="upload" style="display: none" name="file" type="file" accept=".zip"
-                        @change="update" />
-                    </el-button>
-                  </div>
+        <div class="demo-image__preview1">
+          <div v-loading="loading" element-loading-text="Uploading Image" element-loading-spinner="el-icon-loading">
+            <el-image :src="currentImageUrl" class="image_1" :preview-src-list="allImageUrls"
+              style="border-radius: 3px 3px 0 0">
+              <div slot="error">
+                <div slot="placeholder" class="error">
+                  <el-button v-show="showbutton" type="primary" icon="el-icon-upload" class="download_bt"
+                    v-on:click="true_upload">
+                    Upload Zip
+                    <input ref="upload" style="display: none" name="file" type="file" accept=".zip"
+                      @change="update" />
+                  </el-button>
                 </div>
-              </el-image>
-            </div>
-            <div class="img_info_1" style="border-radius: 0 0 5px 5px">
-              <span style="color: white">Input Spectrum: {{ currentImageName }}</span>
-            </div>
-            <div class="image-navigation">
-             
-            </div>
+              </div>
+            </el-image>
           </div>
-          <div class="demo-image__preview2">
-            <div v-loading="loading" element-loading-text="Processing, please wait"
-              element-loading-spinner="el-icon-loading">
-              <el-image :src="url_2" class="image_1" :preview-src-list="srcList1" style="border-radius: 3px 3px 0 0">
-                <div slot="error">
-                  <div slot="placeholder" class="error">{{ wait_return }}</div>
-                </div>
-              </el-image>
-            </div>
-            <div class="img_info_1" style="border-radius: 0 0 5px 5px">
-              <span style="color: white">Detection Result</span>
-            </div>
+          <div class="img_info_1" style="border-radius: 0 0 5px 5px">
+            <span style="color: white">Input Spectrum: {{ currentImageName }}</span>
           </div>
-        </el-card>
-      </div>
-      <div id="info_patient">
-        <!-- 卡片放置表格 -->
-        <el-card style="border-radius: 8px">
-          <div slot="header" class="clearfix">
-            <span>Analysis</span>
-            <el-button style="margin-left: 35px" v-show="!showbutton" type="primary" icon="el-icon-upload"
-              class="download_bt" v-on:click="true_upload2">
-              Re-select Image
-              <input ref="upload2" style="display: none" name="file" type="file" @change="update" />
-            </el-button>
+        </div>
+        <div class="demo-image__preview2">
+          <div v-loading="loading" element-loading-text="Processing, please wait"
+            element-loading-spinner="el-icon-loading">
+            <el-image :src="url_2" class="image_1" :preview-src-list="srcList1" style="border-radius: 3px 3px 0 0">
+              <div slot="error">
+                <div slot="placeholder" class="error">{{ wait_return }}</div>
+              </div>
+            </el-image>
           </div>
-          <el-tabs v-model="activeName">
-            <el-tab-pane label="Information" name="first">
-              <!-- 表格存放特征值 -->
-              <el-table :data="feature_list" height="250" border style="width: 750px; text-align: center"
-                v-loading="loading" element-loading-text="Data is being processed, please wait"
-                element-loading-spinner="el-icon-loading" lazy>
-                <el-table-column label="Key">
-                  <template slot-scope="scope">
-                    <span>{{ scope.row[0] }}</span>
-                  </template>
-                </el-table-column>
-                <el-table-column label="Value">
-                  <template slot-scope="scope">
-                    <span>{{ scope.row[1] }}</span>
-                  </template>
-                </el-table-column>
-                <!-- 添加空数据时显示 "No data" -->
-                <template slot="empty">
-                  <div class="no-data">No data</div>
+          <div class="img_info_1" style="border-radius: 0 0 5px 5px">
+            <span style="color: white">Detection Result</span>
+          </div>
+        </div>
+      </el-card>
+    </div>
+
+    <!-- Analysis Section -->
+    <div id="info_patient" style="width: 100%;">
+      <el-card style="border-radius: 8px">
+        <div slot="header" class="clearfix">
+          <span>Analysis</span>
+          <el-button style="margin-left: 35px" v-show="!showbutton" type="primary" icon="el-icon-upload"
+            class="download_bt" v-on:click="true_upload2">
+            Re-select Image
+            <input ref="upload2" style="display: none" name="file" type="file" @change="update" />
+          </el-button>
+        </div>
+        <el-tabs v-model="activeName">
+          <el-tab-pane label="Information" name="first">
+            <el-table :data="feature_list" height="250" border style="width: 100%; text-align: center"
+              v-loading="loading" element-loading-text="Data is being processed, please wait"
+              element-loading-spinner="el-icon-loading" lazy>
+              <el-table-column label="Key">
+                <template slot-scope="scope">
+                  <span>{{ scope.row[0] }}</span>
                 </template>
-              </el-table>
-            </el-tab-pane>
-          </el-tabs>
-        </el-card>
-      </div>
+              </el-table-column>
+              <el-table-column label="Value">
+                <template slot-scope="scope">
+                  <span>{{ scope.row[1] }}</span>
+                </template>
+              </el-table-column>
+              <!-- Display "No data" when there's no data -->
+              <template slot="empty">
+                <div class="no-data">No data</div>
+              </template>
+            </el-table>
+          </el-tab-pane>
+        </el-tabs>
+      </el-card>
     </div>
   </div>
 </template>
+
 
 <script>
 import axios from "axios";
@@ -349,10 +356,7 @@ export default {
 }
 
 .box-card {
-  width: 680px;
-  height: 200px;
-  border-radius: 8px;
-  margin-top: -20px;
+  width: 100%;
 }
 
 .divider {
@@ -361,13 +365,9 @@ export default {
 
 #CT {
   display: flex;
-  height: 100%;
+  flex-direction: column;
+  align-items: center;
   width: 100%;
-  flex-wrap: wrap;
-  justify-content: center;
-  margin: 0 auto;
-  margin-right: 0px;
-  max-width: 1800px;
 }
 
 #CT_image_1 {
@@ -451,11 +451,11 @@ export default {
 
 #Content {
   width: 85%;
-  height: 800px;
-  background-color: #ffffff;
   margin: 15px auto;
-  display: flex;
-  min-width: 1200px;
+}
+
+.how-to-use {
+  width: 100%;
 }
 
 .divider {
@@ -489,8 +489,7 @@ export default {
 }
 
 #info_patient {
-  margin-top: 10px;
-  margin-right: 160px;
+  width: 100%;
 }
 
 .no-data {

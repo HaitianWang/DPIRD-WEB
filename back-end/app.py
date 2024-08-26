@@ -17,7 +17,7 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'tif', 'zip'}
 
 def create_app():
     app = Flask(__name__)
-    CORS(app)  # CORS for all routes
+    CORS(app, supports_credentials=True)  # CORS for all routes
 
     app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY') or 'you-should-change-this'
     app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
