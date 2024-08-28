@@ -5,10 +5,7 @@
       <div slot="header">
         <h3>How to Use</h3>
       </div>
-      <p>Upload a zip file containing TIF image documents with the following vegetation index spectrums:</p>
-      <p class="spectrum-list">
-        CI, EVI, ExG, ExR, GNDVI, MCARI, MGRVI, MSAVI, NDVI, OSAVI, PRI, SAVI, TVI
-      </p>
+      <p>Upload a zip file containing TIF image documents with different spectrums:</p>
     </el-card>
 
     <!-- Existing Dialog -->

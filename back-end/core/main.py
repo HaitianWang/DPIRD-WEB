@@ -33,9 +33,9 @@ def reduce_channels(X, channels_to_keep=13):
 from PIL import Image
 import numpy as np
 import io
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 
-import rasterio
+#import rasterio
 import numpy as np
 
 def convert_array_to_rgb(image_array):

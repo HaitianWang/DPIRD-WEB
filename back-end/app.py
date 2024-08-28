@@ -2,7 +2,7 @@ from flask import Flask
 from flask_cors import CORS
 from datetime import timedelta
 from tensorflow.keras.models import load_model
-import tensorflow as tf  # Add this import
+import tensorflow as tf
 import logging as rel_log
 import os
 import sqlite3
@@ -39,6 +39,14 @@ def create_app():
     app.register_blueprint(auth_bp)
     app.register_blueprint(file_ops_bp)
 
+    @app.after_request
+    def after_request(response):
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        response.headers['Access-Control-Allow-Credentials'] = 'true'
+        response.headers['Access-Control-Allow-Methods'] = 'POST'
+        response.headers['Access-Control-Allow-Headers'] = 'Content-Type, X-Requested-With'
+        return response
+
     return app
 
 def init_db():
@@ -56,15 +64,13 @@ def init_db():
 
 if __name__ == '__main__':
     app = create_app()
-    
+
     # Ensure required directories exist
     for directory in ['uploads', 'tmp/ct', 'tmp/draw', 'tmp/image', 'tmp/mask', 'tmp/uploads']:
         os.makedirs(directory, exist_ok=True)
-    
+
     with app.app_context():
-        # Include the mse function in custom_objects
         custom_objects['mse'] = tf.keras.losses.mse
-        
         app.model = load_model('cnn_model_with_l1.h5', custom_objects=custom_objects)
-    
+
     app.run(host='127.0.0.1', port=5003, debug=True)
