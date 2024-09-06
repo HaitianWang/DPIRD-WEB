@@ -2,9 +2,12 @@ from flask import Blueprint, jsonify, request, current_app
 from werkzeug.utils import secure_filename
 import os
 import shutil
+import openai  
 from core import main as core_main
 
 upload_bp = Blueprint('upload', __name__)
+
+openai.api_key = "your-openai-api-key"  # This is api-key for OpenAI and it should be replaced by your own
 
 @upload_bp.route('/upload', methods=['POST'])
 def upload_file():
@@ -39,3 +42,31 @@ def upload_file():
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in current_app.config['ALLOWED_EXTENSIONS']
+
+
+def analyze_text(text):
+    
+    try:
+        
+        response = openai.Completion.create(
+            engine="text-davinci-003",  
+            prompt=text,  
+            max_tokens=150,  
+            n=1,  
+            stop=None,  
+            temperature=0.7  
+        )
+
+
+        gpt_reply = response.choices[0].text.strip()
+        return gpt_reply
+
+    except Exception as e:
+        return f"Error: {str(e)}"
+
+
+
+
+
+
+
