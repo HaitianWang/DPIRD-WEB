@@ -1,3 +1,4 @@
+import logging
 from flask import Blueprint, jsonify, request
 import sqlite3
 import db
@@ -32,23 +33,32 @@ def regi():
     username = request.form.get("username")
     pwd = request.form.get("pwd")
    
-    # Check if user exists
-    exists = db.query_db("SELECT * FROM user WHERE username = ?", (username,), one=True)
-    if exists:
-        return jsonify({"status": "0", "message": "Username already exists"})
-   
-    # Hash the password
-    hashed_password = generate_password_hash(pwd)
-   
-    # Insert new user
-    conn = db.get_db_connection()
-    cursor = conn.cursor()
+    if not username or not pwd:
+        return jsonify({"status": "0", "message": "Username and password are required"})
+
     try:
+        conn = db.get_db_connection()
+        cursor = conn.cursor()
+
+        # Check if user exists
+        cursor.execute("SELECT * FROM user WHERE username = ?", (username,))
+        if cursor.fetchone():
+            return jsonify({"status": "0", "message": "Username already exists"})
+   
+        # Hash the password
+        hashed_password = generate_password_hash(pwd)
+   
+        # Insert new user
         cursor.execute("INSERT INTO user (username, pwd) VALUES (?, ?)", (username, hashed_password))
         conn.commit()
+        
         return jsonify({"status": "1", "message": "Registration successful"})
-    except sqlite3.Error as e:
-        return jsonify({"status": "0", "message": "Registration failed due to database error"})
+    
+    except Exception as e:
+        conn.rollback()
+        logging.error(f"Registration failed: {str(e)}")
+        return jsonify({"status": "0", "message": "Registration failed due to an error"})
+    
     finally:
         cursor.close()
         conn.close()

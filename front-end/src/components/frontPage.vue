@@ -9,7 +9,7 @@
         <el-input type="password" placeholder="please enter password" v-model="pwd"/>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" v-on:click="login('loginForm')" id="btn">login</el-button>
+        <el-button type="primary" v-on:click="loginUser('loginForm')" id="btn">login</el-button>
       </el-form-item>
       <h5>no account? please <span v-on:click="goRegister()" style="color: blue;text-decoration: underline">register</span></h5>
     </el-form>
@@ -17,62 +17,56 @@
 </template>
 
 <script>
-  import axios from "axios";
+import axios from "axios";
+import { mapActions } from 'vuex';
 
-  export default {
-    name: "frontPage",
-    created() {
-      this.$emit('header', false);
-      this.$emit('content', false);
-      this.$emit('footer', false);
-    },
-    data() {
-      return {
-        username: "",
-        pwd: "",
-        server_url: "http://127.0.0.1:5003"
-      }
-    },
-    methods: {
-      login(data) {
-        console.log("Attempting login with:", this.username, this.pwd);
-        let param = new FormData();
-        param.append("username", this.username);
-        param.append("pwd", this.pwd);
-        let config = {
-          headers: { "Content-Type": "multipart/form-data" },
-        };
-        axios
-          .post(this.server_url + "/login", param, config)
-          .then((response) => {
-            console.log("Login response:", response.data);
-            if (response.data.status === "1") {
-              console.log("Login successful");
-              this.$router.replace({
-                path: "/mainPage",
-                name: 'mainPage',
-                query: {
-                  username: this.username
-                }
-              });
-            } else {
-              console.log("Login failed");
-              window.alert(response.data.message || "Username or password error");
-            }
-          })
-          .catch((error) => {
-            console.error("Login error:", error);
-            window.alert("An error occurred during login");
-          });
-      },
-      goRegister(){
-        this.$router.push({
-          path: "/regiPage",
-          name: "regiPage",
+export default {
+  name: "frontPage",
+  created() {
+    this.$emit('header', false);
+    this.$emit('content', false);
+    this.$emit('footer', false);
+  },
+  data() {
+    return {
+      username: "",
+      pwd: "",
+      server_url: "http://127.0.0.1:5003"
+    }
+  },
+  methods: {
+    ...mapActions(['login']),
+    loginUser(data) {
+      console.log("Attempting login with:", this.username, this.pwd);
+      let param = new FormData();
+      param.append("username", this.username);
+      param.append("pwd", this.pwd);
+      let config = {
+        headers: { "Content-Type": "multipart/form-data" },
+      };
+      axios
+        .post(this.server_url + "/login", param, config)
+        .then((response) => {
+          console.log("Login response:", response.data);
+          if (response.data.status === "1") {
+            console.log("Login successful");
+            this.login(this.username);  // Dispatch Vuex action
+            this.$router.replace('/mainPage');
+          } else {
+            console.log("Login failed");
+            window.alert(response.data.message || "Username or password error");
+          }
+        })
+        .catch((error) => {
+          console.error("Login error:", error);
+          window.alert("An error occurred during login");
         });
-      }
     },
-  };
+    goRegister(){
+      this.$router.push('/regiPage');
+    }
+  },
+};
 </script>
 
 <style scoped>

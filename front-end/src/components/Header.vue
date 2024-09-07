@@ -7,8 +7,8 @@
       </span>
     </div>
     <nav class="middle">
-      <router-link :to="{ path: '/uploadPage', query: { username: username } }" class="nav-link">Upload</router-link>
-      <router-link :to="{ path: '/timeCapsule', query: { username: username } }" class="nav-link">TimeCapsule</router-link>
+      <router-link to="/uploadPage" class="nav-link">Upload</router-link>
+      <router-link to="/timeCapsule" class="nav-link">TimeCapsule</router-link>
     </nav>
     <div id="word">
       <h1>{{ msg }}</h1>
@@ -18,9 +18,16 @@
 </template>
 
 <script>
+  import { mapGetters } from 'vuex';
+
   export default {
     name: "Header",
-    props: ['username'],
+    computed: {
+      ...mapGetters(['getUsername']),
+      username() {
+        return this.getUsername;
+      }
+    },
     data() {
       return {
         msg: "Precision Agriculture: UWAIntelliCrop",
@@ -35,13 +42,7 @@
         });
       },
       goMainPage() {
-        this.$router.push({
-          path: "/mainPage",
-          name: "mainPage",
-          query: {
-            username: this.username
-          }
-        });
+        this.$router.push('/mainPage');
       },
     },
   };

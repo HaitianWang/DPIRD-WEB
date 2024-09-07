@@ -99,6 +99,7 @@
 
 <script>
 import axios from "axios";
+import { mapGetters } from 'vuex';
 
 export default {
   name: "Content",
@@ -137,6 +138,7 @@ export default {
     };
   },
   computed: {
+    ...mapGetters(['getUsername']),
     currentImageUrl() {
       return this.allImageUrls[this.currentImageIndex] || '';
     },

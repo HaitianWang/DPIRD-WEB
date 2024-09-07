@@ -12,8 +12,8 @@
         <el-input type="password" placeholder="Please repeat the password" v-model="user.pwd2" />
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" v-on:click="regi('regiForm')" id="btn">Confirm</el-button>
-        <el-button type="primary" v-on:click="goFrontPage()" id="btn2">Back</el-button>
+        <el-button type="primary" @click="regi" id="btn">Confirm</el-button>
+        <el-button type="primary" @click="goFrontPage" id="btn2">Back</el-button>
       </el-form-item>
     </el-form>
   </div>
@@ -41,29 +41,29 @@ export default {
   },
   methods: {
     showAlert(message) {
-      window.alert(message);
+      this.$message({
+        showClose: true,
+        message: message,
+        type: 'error'
+      });
     },
     validateForm() {
       if (this.user.username.trim().length === 0) {
-        this.showAlert("Please enter username!");
+        this.showAlert("Please enter username");
         return false;
       }
-      if (this.user.pwd.trim().length === 0) {
-        this.showAlert("Please enter password!");
-        return false;
-      }
-      if (this.user.pwd.length > 0 && this.user.pwd.length < 6) {
-        this.showAlert("Password must be more than 6 characters!");
+      if (this.user.pwd.length < 6) {
+        this.showAlert("Password must be at least 6 characters");
         return false;
       }
       if (this.user.pwd !== this.user.pwd2) {
-        this.showAlert("Passwords do not match!");
+        this.showAlert("Passwords do not match");
         return false;
       }
       return true;
     },
     async regi() {
-      console.log("Attempting registration with:", this.user.username, this.user.pwd);
+      console.log("Attempting registration with:", this.user.username);
       if (!this.validateForm()) return;
       try {
         const param = new FormData();
@@ -75,16 +75,16 @@ export default {
         console.log("Sending registration request");
         const response = await axios.post(`${this.server_url}/regi`, param, config);
         console.log("Registration response:", response.data);
-        if (response.data.status === "1") {  // Changed this line to match login page
-          console.log("Registration successful");
-          this.showAlert("Registration successful!");
-          this.$router.replace({
-            path: "/frontPage",
-            name: 'frontPage',
-            query: { username: this.user.username }
+        if (response.data.status === "1") {
+          this.$message({
+            message: "Registration successful! Please log in.",
+            type: 'success',
+            duration: 3000
           });
+          setTimeout(() => {
+            this.$router.push('/');  // Redirect to the front page (login page)
+          }, 2000);
         } else {
-          console.log("Registration failed");
           this.showAlert(response.data.message || "Registration failed");
         }
       } catch (error) {
@@ -93,10 +93,7 @@ export default {
       }
     },
     goFrontPage() {
-      this.$router.push({
-        path: "/frontPage",
-        name: "frontPage",
-      });
+      this.$router.push('/frontPage');
     }
   }
 };

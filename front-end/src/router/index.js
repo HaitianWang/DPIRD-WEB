@@ -5,10 +5,11 @@ import mainPage from "../components/mainPage";
 import regiPage from "../components/regiPage";
 import uploadPage from "../components/uploadPage";
 import timeCapsule from "../components/timeCapsule";
+import store from '../store'
 
 Vue.use(Router)
 
-export default new Router({
+const router = new Router({
   routes: [
     {
       path: '/',
@@ -18,7 +19,8 @@ export default new Router({
     {
       path: '/mainPage',
       name: 'mainPage',
-      component: mainPage
+      component: mainPage,
+      meta: { requiresAuth: true }
     },
     {
       path: '/regiPage',
@@ -28,12 +30,32 @@ export default new Router({
     {
       path: '/uploadPage',
       name: 'uploadPage',
-      component: uploadPage
+      component: uploadPage,
+      meta: { requiresAuth: true }
     },
     {
       path: '/timeCapsule',
       name: 'timeCapsule',
-      component: timeCapsule
+      component: timeCapsule,
+      meta: { requiresAuth: true }
     },
   ]
 })
+
+router.beforeEach((to, from, next) => {
+  if (to.matched.some(record => record.meta.requiresAuth)) {
+    // Check if user is authenticated using Vuex store
+    if (!store.getters.isLoggedIn) {
+      next({
+        path: '/',
+        query: { redirect: to.fullPath }
+      })
+    } else {
+      next()
+    }
+  } else {
+    next()
+  }
+})
+
+export default router

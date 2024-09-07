@@ -30,14 +30,6 @@ def reduce_channels(X, channels_to_keep=13):
     """
     return X[:, :, :, 1:]
 
-from PIL import Image
-import numpy as np
-import io
-#import matplotlib.pyplot as plt
-
-#import rasterio
-import numpy as np
-
 def convert_array_to_rgb(image_array):
     """
     Convert a numpy array from a normalized RGB image to an 8-bit RGB image.
@@ -61,26 +53,62 @@ def convert_array_to_rgb(image_array):
    
     return rgb_array
 
-import matplotlib.pyplot as plt
-import io
-from PIL import Image
+def save_image(mask, title):
+    """
+    Save an image where the colormap reflects the true range of -1 to 1.
+    
+    Parameters:
+    mask (numpy.ndarray): The predicted mask array.
+    title (str): Title of the image.
+    
+    Returns:
+    PIL.Image.Image, numpy.ndarray: The saved image in both PIL and numpy formats.
+    """
+    # Normalize the colormap to reflect the range of -1 to 1
+    norm = mcolors.Normalize(vmin=-1, vmax=1)
 
-def save_image(img_array, title, cmap=None):
+    # Define a custom colormap: Red for weed, white for neutral, green for vegetation
+    colors = [(1, 0, 0), (1, 1, 1), (0, 1, 0)]
+    cmap = mcolors.LinearSegmentedColormap.from_list('custom_cmap', colors, N=256)
+
+    # Apply the colormap with normalization
     plt.figure(figsize=(5, 5))
-   
-    if cmap is None:
-        rgb_img = convert_array_to_rgb(img_array)
-        plt.imshow(rgb_img)
-    else:
-        plt.imshow(img_array, cmap=cmap)
-   
+    plt.imshow(mask, cmap=cmap, norm=norm)
     plt.title(title)
     plt.axis('off')
+    
+    # Save the image
     buf = io.BytesIO()
-    plt.savefig(buf, format='png')
+    plt.savefig(buf, format='png', dpi=100)
     plt.close()
     buf.seek(0)
-    return Image.open(buf)
+    pil_img = Image.open(buf)
+    np_img = np.array(pil_img)
+    
+    return pil_img, np_img
+
+def color_distribution(mask):
+    """
+    Calculate the distribution of colors in the predicted mask.
+    
+    Parameters:
+    mask (numpy.ndarray): The predicted mask array.
+    
+    Returns:
+    dict: A dictionary containing the percentage of each color.
+    """
+    total_pixels = mask.size
+    
+    # Adjust these thresholds based on your specific range
+    red_pixels = np.sum(mask < -0.1)  # Red for negative values
+    green_pixels = np.sum(mask > 0.1)  # Green for positive values
+    white_pixels = np.sum((mask >= -0.1) & (mask <= 0.1))  # White for values close to 0
+
+    return {
+        'red': (red_pixels / total_pixels) * 100,
+        'green': (green_pixels / total_pixels) * 100,
+        'white': (white_pixels / total_pixels) * 100
+    }
 
 def c_main(path, model):
     # Preprocess the data and get the input images and original RGB images
@@ -100,29 +128,36 @@ def c_main(path, model):
     print("Predicting on validation set")
     y_pred = model.predict(X)
 
-    # Custom color map: -1 to red, 0 to white, 1 to green
-    def custom_cmap():
-        colors = [(1, 0, 0), (1, 1, 1), (0, 1, 0)]  # Red, White, Green
-        cmap_name = 'custom_cmap'
-        return matplotlib.colors.LinearSegmentedColormap.from_list(cmap_name, colors, N=256)
-
     # Save the original RGB image
-    original_rgb_image = original_rgb_images[0]  # Assuming we're working with the first image
-    input_images = [save_image(original_rgb_image, 'Original RGB')]
+    original_rgb_image = original_rgb_images[0]
+    input_images = [save_image(original_rgb_image, 'Original RGB')[0]]
 
-    # Apply the custom colormap to the predicted mask
-    y_pred_rescaled = np.clip(y_pred[0, :, :, 0], -1, 1)  # Assuming the output is in the range [-1, 1]
-    predicted_mask = save_image(y_pred_rescaled, 'Predicted Mask', cmap=custom_cmap())
+    # Get the predicted mask
+    predicted_mask = y_pred[0, :, :, 0]  # Take the first channel
+
+    # Calculate color distribution using the original predicted mask
+    color_stats = color_distribution(predicted_mask)
+
+    # Save the predicted mask with the true range of -1 to 1 reflected in the colormap
+    predicted_mask_pil, predicted_mask_np = save_image(predicted_mask, 'Predicted Mask')
+
+    # Save the original mask and colorized mask for visual inspection
+    plt.imsave('predicted_mask_with_true_range.png', predicted_mask_np)
+
+    print(f"Predicted mask shape: {predicted_mask.shape}")
+    print(f"Predicted mask min: {predicted_mask.min()}, max: {predicted_mask.max()}")
+    print(f"Color distribution: {color_stats}")
 
     # Unique ID for this prediction
     pid = str(uuid.uuid4())
 
     # Image info
     image_info = {
-        'input_shape': X.shape,
-        'prediction_shape': y_pred.shape,
+        'Vegetation': f"{color_stats['green']:.2f}%",
+        'Weed': f"{color_stats['red']:.2f}%",
+        'Misc/Other': f"{color_stats['white']:.2f}%"
     }
     
     print(f"Original RGB image shape: {original_rgb_images[0].shape}, dtype: {original_rgb_images[0].dtype}")
 
-    return pid, input_images, predicted_mask, image_info, ['RGB']
+    return pid, input_images, predicted_mask_pil, image_info, ['RGB']
