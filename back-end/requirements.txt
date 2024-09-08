@@ -82,8 +82,7 @@ stack-data==0.6.3
 sympy==1.13.2
 tensorboard
 tensorboard-data-server
-tensorflow
-tensorflow-intel
+tensorflow-macos
 tensorflow-io-gcs-filesystem
 termcolor
 threadpoolctl
@@ -97,3 +96,6 @@ wcwidth==0.2.13
 Werkzeug==3.0.3
 wrapt==1.16.0
 zipp==3.20.0
+flask-cors
+openai==0.27.0
+

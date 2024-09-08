@@ -2,16 +2,16 @@ from core import process
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-import rasterio
-import tensorflow as tf
+#import rasterio
+#import tensorflow as tf
 import matplotlib.colors as mcolors
 import io
 from PIL import Image
 import uuid
 import matplotlib
-from sklearn.model_selection import train_test_split
-from tensorflow.keras.layers import Conv2D, Input
-from tensorflow.keras.models import Model
+#from sklearn.model_selection import train_test_split
+#from tensorflow.keras.layers import Conv2D, Input
+#from tensorflow.keras.models import Model
 
 # Assuming process is an external module that you import
 # from core import process
@@ -20,11 +20,11 @@ def reduce_channels(X, channels_to_keep=13):
     """
     Reduce the number of channels in the input data to the specified number.
     This function assumes that the channels you want to keep are the first `channels_to_keep` channels.
-    
+
     Parameters:
     X (numpy array): The input data with shape (num_samples, height, width, num_channels).
     channels_to_keep (int): The number of channels to keep.
-    
+
     Returns:
     numpy array: The input data with reduced channels.
     """
@@ -33,10 +33,10 @@ def reduce_channels(X, channels_to_keep=13):
 def convert_array_to_rgb(image_array):
     """
     Convert a numpy array from a normalized RGB image to an 8-bit RGB image.
-   
+
     Parameters:
     image_array (numpy.ndarray): The input image array (normalized to [0, 1]).
-   
+
     Returns:
     numpy.ndarray: The image converted to RGB with values in the range [0, 255].
     """
@@ -47,20 +47,20 @@ def convert_array_to_rgb(image_array):
     elif image_array.ndim > 3:
         # If it has more than 3 dimensions, take the first 3 channels
         image_array = image_array[:, :, :3]
-   
+
     # Convert to 8-bit (0-255 range)
     rgb_array = (image_array * 255).astype(np.uint8)
-   
+
     return rgb_array
 
 def save_image(mask, title):
     """
     Save an image where the colormap reflects the true range of -1 to 1.
-    
+
     Parameters:
     mask (numpy.ndarray): The predicted mask array.
     title (str): Title of the image.
-    
+
     Returns:
     PIL.Image.Image, numpy.ndarray: The saved image in both PIL and numpy formats.
     """
@@ -76,7 +76,7 @@ def save_image(mask, title):
     plt.imshow(mask, cmap=cmap, norm=norm)
     plt.title(title)
     plt.axis('off')
-    
+
     # Save the image
     buf = io.BytesIO()
     plt.savefig(buf, format='png', dpi=100)
@@ -84,21 +84,21 @@ def save_image(mask, title):
     buf.seek(0)
     pil_img = Image.open(buf)
     np_img = np.array(pil_img)
-    
+
     return pil_img, np_img
 
 def color_distribution(mask):
     """
     Calculate the distribution of colors in the predicted mask.
-    
+
     Parameters:
     mask (numpy.ndarray): The predicted mask array.
-    
+
     Returns:
     dict: A dictionary containing the percentage of each color.
     """
     total_pixels = mask.size
-    
+
     # Adjust these thresholds based on your specific range
     red_pixels = np.sum(mask < -0.1)  # Red for negative values
     green_pixels = np.sum(mask > 0.1)  # Green for positive values
@@ -114,17 +114,17 @@ def c_main(path, model):
     # Preprocess the data and get the input images and original RGB images
     X, original_rgb_images, spectrum_names = process.pre_process(path)
     print(f'Number of images: {X.shape[0]}')
-    
+
     if X.size == 0:
         raise ValueError("The dataset is empty. Please check the data directory and file paths.")
-   
+
     # Reduce the channels to 13 if necessary
     if X.shape[-1] == 14:
         X = reduce_channels(X, channels_to_keep=13)
         spectrum_names = spectrum_names[:13]  # Adjust the spectrum names if necessary
 
     matplotlib.use('Agg')
-    
+
     print("Predicting on validation set")
     y_pred = model.predict(X)
 
@@ -157,7 +157,7 @@ def c_main(path, model):
         'Weed': f"{color_stats['red']:.2f}%",
         'Misc/Other': f"{color_stats['white']:.2f}%"
     }
-    
+
     print(f"Original RGB image shape: {original_rgb_images[0].shape}, dtype: {original_rgb_images[0].dtype}")
 
     return pid, input_images, predicted_mask_pil, image_info, ['RGB']

@@ -60,47 +60,45 @@ def create_dataset(base_path):
     inputs = []
     original_rgb_images = []  # To store the original RGB images
     print(f"Traversing base directory: {base_path}")
-    
-    for root, dirs, files in os.walk(base_path):
-        for dir_name in dirs:
-            if dir_name.startswith('smalldata_'):
-                dir_path = os.path.join(root, dir_name)
-                print(f"Processing folder: {dir_path}")
-                dataset_images = {}
-                missing_indices = []
 
-                for index in SPECTRAL_INDICES:
-                    matching_files = [f for f in os.listdir(dir_path) if f.startswith(f'{index}_') and f.endswith('.tif')]
-                    if matching_files:
-                        file_path = os.path.join(dir_path, matching_files[0])
-                        print(f"Found file for {index}: {file_path}")
-                        # Use is_rgb=True for RGB images
-                        data = load_tif(file_path, is_rgb=(index == 'RGB'))
-                        
-                        # Ensure all images have the same shape
-                        if index == 'RGB':
-                            # For RGB, use the first channel
-                            dataset_images[index] = data[:,:,0]
-                            # Store the full RGB image
-                            original_rgb_images.append(data)
-                        else:
-                            dataset_images[index] = data
-                    else:
-                        print(f"Missing file for index {index} in directory {dir_path}")
-                        missing_indices.append(index)
-                        break  # Stop processing this directory if any index is missing
+    # 获取 base_path 中的所有文件
+    files = os.listdir(base_path)
+    print(f"Files in base path: {files}")
+    dataset_images = {}
+    missing_indices = []
 
-                if len(missing_indices) == 0:
-                    # Stack the images in the correct order as per SPECTRAL_INDICES
-                    input_stack = np.stack([dataset_images[index] for index in SPECTRAL_INDICES], axis=-1)
-                    if input_stack.shape[-1] == len(SPECTRAL_INDICES):  # Ensure correct number of channels
-                        inputs.append(input_stack)
-                    else:
-                        print(f"Warning: Unexpected number of channels: {input_stack.shape[-1]}. Expected {len(SPECTRAL_INDICES)}.")
-                else:
-                    print(f"Skipping folder {dir_path} due to missing indices: {missing_indices}")
-    
-    # Verification step
+    # 遍历 SPECTRAL_INDICES 来匹配文件
+    for index in SPECTRAL_INDICES:
+        # 找到包含光谱索引（如 'CI', 'EVI', 'ExG' 等）的文件
+        matching_files = [f for f in files if f.startswith(f'{index}_') and f.endswith('.tif')]
+        if matching_files:
+            file_path = os.path.join(base_path, matching_files[0])
+            print(f"Found file for {index}: {file_path}")
+            # 如果是 RGB 图像，设置 is_rgb=True
+            data = load_tif(file_path, is_rgb=(index == 'RGB'))
+
+            # 如果是 RGB 图像，使用第一个通道
+            if index == 'RGB':
+                dataset_images[index] = data[:, :, 0]  # 仅使用 RGB 图像的第一个通道
+                original_rgb_images.append(data)  # 存储完整的 RGB 图像
+            else:
+                dataset_images[index] = data
+        else:
+            print(f"Missing file for index {index} in directory {base_path}")
+            missing_indices.append(index)
+            break  # 如果缺少索引文件，停止处理该目录
+
+    if len(missing_indices) == 0:
+        # 按 SPECTRAL_INDICES 的顺序堆叠图像
+        input_stack = np.stack([dataset_images[index] for index in SPECTRAL_INDICES], axis=-1)
+        if input_stack.shape[-1] == len(SPECTRAL_INDICES):  # 确保通道数量正确
+            inputs.append(input_stack)
+        else:
+            print(f"Warning: Unexpected number of channels: {input_stack.shape[-1]}. Expected {len(SPECTRAL_INDICES)}.")
+    else:
+        print(f"Skipping due to missing indices: {missing_indices}")
+
+    # 验证是否加载了任何图像
     if inputs:
         num_channels = inputs[0].shape[-1]
         print(f"Finished creating dataset. Number of images: {len(inputs)}. Each image has {num_channels} channels.")
@@ -111,12 +109,6 @@ def create_dataset(base_path):
 
 
 def pre_process(data_path):
-    # Extracting the ZIP file
-    unzip_path = data_path.replace('.zip', '')
-    if not os.path.exists(unzip_path):
-        with zipfile.ZipFile(data_path, 'r') as zip_ref:
-            zip_ref.extractall(unzip_path)
-            print(f"Extracted zip file to {unzip_path}")
-    
-    X, original_rgb_images = create_dataset(unzip_path)
+    print("data_path",data_path)
+    X, original_rgb_images = create_dataset(data_path)
     return X, original_rgb_images, SPECTRAL_INDICES
