@@ -5,6 +5,9 @@ import os
 import shutil
 import datetime
 import core.main
+import openai
+
+openai.api_key = "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"  # This is api-key for OpenAI and it should be replaced by your own
 
 file_ops_bp = Blueprint('file_ops', __name__)
 
@@ -25,6 +28,16 @@ def upload_file():
         # Process all spectrums
         pid, input_images, predicted_mask, image_info, spectrum_names = core.main.c_main(
             image_path, current_app.model)
+
+        print("openai-version",openai.__version__)
+
+        # Analyze image_info using GPT to get weed removal suggestions
+        analysis_prompt = f"""
+        The image shows {image_info['Vegetation']} vegetation, {image_info['Weed']} weed, and {image_info['Misc/Other']} miscellaneous or other elements.
+        Please provide suggestions for how to effectively remove the weeds while minimizing harm to the crops.
+        """
+        weed_removal_suggestions = analyze_text(analysis_prompt)
+        print("suggestions", weed_removal_suggestions)
        
         # Create directories if they don't exist
         os.makedirs('./tmp/input', exist_ok=True)
@@ -64,3 +77,21 @@ def show_photo(file):
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in current_app.config['ALLOWED_EXTENSIONS']
+
+def analyze_text(text):
+    try:
+        response = openai.Completion.create(
+            engine="text-davinci-003",
+            prompt=text,
+            max_tokens=150,
+            n=1,
+            stop=None,
+            temperature=0.7
+        )
+        gpt_reply = response.choices[0].text.strip()
+        return gpt_reply
+
+    except Exception as e:
+        return f"Error: {str(e)}"
+
+
