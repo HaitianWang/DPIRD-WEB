@@ -9,7 +9,7 @@ import core.main
 import openai
 from .process_indices import process_zip_and_calculate_indices
 
-openai.api_key = "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"  # This is api-key for OpenAI and it should be replaced by your own
+openai.api_key = ""  # This is api-key for OpenAI and it should be replaced by your own
 
 file_ops_bp = Blueprint('file_ops', __name__)
 
