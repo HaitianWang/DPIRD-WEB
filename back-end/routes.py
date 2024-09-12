@@ -7,7 +7,7 @@ from core import main as core_main
 
 upload_bp = Blueprint('upload', __name__)
 
-openai.api_key = "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"  # This is api-key for OpenAI and it should be replaced by your own
+openai.api_key = ""  # This is api-key for OpenAI and it should be replaced by your own
 
 @upload_bp.route('/upload', methods=['POST'])
 def upload_file():
