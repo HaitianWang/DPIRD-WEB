@@ -30,7 +30,7 @@
     },
     data() {
       return {
-        msg: "Precision Agriculture: UWAIntelliCrop",
+        msg: "Precision Agriculture: DPIRD AgriVision",
         activeIndex: "2",
       };
     },

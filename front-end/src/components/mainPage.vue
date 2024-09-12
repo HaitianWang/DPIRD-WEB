@@ -6,21 +6,21 @@
         <img src="@/assets/3.png" alt="icon" class="small-icon"> <!-- 小图片的位置 -->
         <h2>Harnessing Multispectral Imaging and Deep
           Learning for Precision Agriculture:<br/><br/>
-          The UWAIntelliCrop Initiative</h2>
+          The DPIRD AgriVision</h2>
       </div>
     </div>
     <div class="intro-text">
       <p>
         The primary objective of this project is to conceive, develop, and implement the application system
-        named UWAIntelliCrop, a robust and integrated system that harnesses the power of advanced
+        named DPIRD AgriVision, a robust and integrated system that harnesses the power of advanced
         multispectral imaging combined with sophisticated deep learning techniques. This system will be
         tailored to accurately differentiate between various crop types and weed species, enabling precise
         monitoring and assessment of the extent and severity of crop damage. By fusing these insights
-        with GIS data, UWAIntelliCrop will not only visualize the impacts on a macro scale but also
+        with GIS data, DPIRD AgriVision will not only visualize the impacts on a macro scale but also
         generate detailed analytical reports and actionable recommendations for effective farm
         management. The ultimate aim is to support farmers in the Kondinin region—and potentially
         beyond—in implementing efficacious management strategies to minimize economic losses.
-        Through its deployment on cloud infrastructure, UWAIntelliCrop promises accessibility and
+        Through its deployment on cloud infrastructure, DPIRD AgriVision promises accessibility and
         utility to users across diverse locations, offering a scalable solution in the domain of precision
         agriculture.
       </p>

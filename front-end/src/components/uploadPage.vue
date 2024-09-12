@@ -5,7 +5,14 @@
       <div slot="header">
         <h3>How to Use</h3>
       </div>
-      <p>Upload a zip file containing TIF image documents with different spectrums:</p>
+      <p>Upload a zip file containing TIF image documents with different spectrums.</p>
+      <p>
+        In the output image,
+        <span style="color: lightgreen;">green</span> is crops,
+        <span style="color: pink;">pink</span> is weed,
+        <span style="color: lightgray;">white</span> is others.
+      </p>
+
     </el-card>
 
     <!-- Existing Dialog -->
@@ -93,6 +100,16 @@
         </el-tabs>
       </el-card>
     </div>
+      <div id="info_patient2" style="width: 100%;">
+        <!-- Suggestions Section -->
+        <el-card style="border-radius: 8px; margin-bottom: 20px;">
+          <div slot="header" class="clearfix">
+            <span>Weed Removal Suggestions</span>
+          </div>
+          <p v-if="filteredWeedRemovalSuggestions" v-html="filteredWeedRemovalSuggestions"></p>
+          <p v-else>No suggestions available.</p>
+        </el-card>
+      </div>
   </div>
 </template>
 
@@ -123,6 +140,7 @@
         wait_return: "Waiting for upload",
         wait_upload: "Waiting for upload",
         loading: false,
+        weedRemovalSuggestions: "",
         table: false,
         isNav: false,
         showbutton: true,
@@ -145,9 +163,13 @@
       currentImageName() {
         return this.imageNames[this.currentImageIndex] || '';
       },
+      filteredWeedRemovalSuggestions() {
+        // 使用正则表达式去除包含 '*' 的部分
+        return this.weedRemovalSuggestions.replace(/\*.*?\*/g, '');
+      }
     },
     created: function () {
-      document.title = "UWAIntelliCrop";
+      document.title = "DPIRD AgriVision";
     },
     methods: {
       previousImage() {
@@ -255,7 +277,7 @@
                   return [formattedKey, displayValue];
                 });
               }
-
+              this.weedRemovalSuggestions = response.data.weed_removal_suggestions;
               this.dialogTableVisible = false;
               this.percentage = 0;
               this.notice1();
@@ -498,4 +520,10 @@
     line-height: 250px;
     /* Adjust this value to vertically center the text */
   }
+
+  #info_patient2 {
+    margin-top: 20px;
+    text-align: left;
+  }
+
 </style>

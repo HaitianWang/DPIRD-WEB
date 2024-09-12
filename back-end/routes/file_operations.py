@@ -9,7 +9,7 @@ import core.main
 import openai
 from .process_indices import process_zip_and_calculate_indices
 
-openai.api_key = "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"  # This is api-key for OpenAI and it should be replaced by your own
+openai.api_key = "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"  # This is api-key for OpenAI and it should be replaced by your own
 
 file_ops_bp = Blueprint('file_ops', __name__)
 
@@ -45,8 +45,14 @@ def upload_file():
 
         # Analyze image_info using GPT to get weed removal suggestions
         analysis_prompt = f"""
-        The image shows {image_info['Vegetation']} vegetation, {image_info['Weed']} weed, and {image_info['Misc/Other']} miscellaneous or other elements.
-        Please provide suggestions for how to effectively remove the weeds while minimizing harm to the crops.
+        The DPIRD AgriVision platform is an expert platform developed by the Department of Agriculture of Western Australia, designed for further analysis of
+        weed identification results and providing AI-driven professional advice. You are now serving as a professional agricultural consultant on this
+        platform. Based on the weed information from the test field we provide, combined with your professional agricultural knowledge and the remote
+        sensing knowledge base, please provide detailed explanations and analysis. Additionally, give guidance tailored to the specific conditions of
+        Western Australia (such as environment, climate, soil, rainfall, etc.). If there is a high weed density, provide a clear warning based on the
+        national context of Australia, and offer advanced analysis.
+        The image shows {image_info['Vegetation']} vegetation, {image_info['Weed']} weed, and {image_info['Misc/Other']} miscellaneous or other elements. 
+        Attention: Don't have markdown formatting. Do not bold text. No "*" in output. Different points suggest subparagraphs.
         """
         weed_removal_suggestions = analyze_text(analysis_prompt)
         print("suggestions", weed_removal_suggestions)
@@ -70,7 +76,8 @@ def upload_file():
             'input_image_urls': input_image_urls,
             'spectrum_names': spectrum_names,
             'predicted_mask_url': f'{request.host_url}tmp/draw/{pid}_predicted.png',
-            'image_info': image_info
+            'image_info': image_info,
+            'weed_removal_suggestions': weed_removal_suggestions
         })
 
     return jsonify({'status': 0})
@@ -92,15 +99,18 @@ def allowed_file(filename):
 
 def analyze_text(text):
     try:
-        response = openai.Completion.create(
-            engine="text-davinci-003",
-            prompt=text,
-            max_tokens=150,
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",  # 使用聊天模型
+            messages=[
+                {"role": "system", "content": "You're a helpful agricultural expert."},  # 给定一个系统角色
+                {"role": "user", "content": text}  # 用户输入为传入的文本
+            ],
+            max_tokens=500,
             n=1,
             stop=None,
             temperature=0.7
         )
-        gpt_reply = response.choices[0].text.strip()
+        gpt_reply = response.choices[0].message['content'].strip()  # 获取聊天模型的回复
         return gpt_reply
 
     except Exception as e:
