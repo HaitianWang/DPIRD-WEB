@@ -56,7 +56,7 @@
     padding: 0px 40px;
     width: 90%;
     margin: 10px auto;
-    background-color: #6ec2b1; /* 绿色背景 */
+    background-color: #36471f; /* 绿色背景#6ec2b1 */
     color: white; /* 白色文字 */
   }
 

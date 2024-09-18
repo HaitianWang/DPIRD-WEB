@@ -8,7 +8,7 @@ export default {
   name: "Footer",
   data() {
     return {
-      msg: "2024 UWAIntelliCrop",
+      msg: "2024 DPIRD AgriVision",
     };
   },
 };
@@ -25,7 +25,7 @@ export default {
 }
 
 p {
-  color: #21b3b9;
+  color: #36471f;
   text-align: center;
   margin: 30px auto;
   font-size: 1.1em;

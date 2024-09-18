@@ -5,7 +5,7 @@
       <div slot="header">
         <h3>How to Use</h3>
       </div>
-      <p>Upload a zip file containing TIF image documents with different spectrums.</p>
+      <p>Upload a zip file containing TIF image documents with different spectrums: Blue, Green, Red, RedEdge, NIR, RGB </p>
       <p>
         In the output image,
         <span style="color: lightgreen;">green</span> is crops,
@@ -46,7 +46,7 @@
             </el-image>
           </div>
           <div class="img_info_1" style="border-radius: 0 0 5px 5px">
-            <span style="color: white">Input Spectrum: {{ currentImageName }}</span>
+            <span style="color: white">Multi-Spectrum Image</span>
           </div>
         </div>
         <div class="demo-image__preview2">
@@ -418,7 +418,7 @@
     height: 30px;
     width: 275px;
     text-align: center;
-    background-color: #21b3b9;
+    background-color: #36471f;
     line-height: 30px;
   }
 

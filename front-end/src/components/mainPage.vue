@@ -1,13 +1,7 @@
 <template>
   <div class="main-page">
     <div class="field-section">
-      <img src="@/assets/1.png" alt="image" class="field-image">
-      <div class="field-text">
-        <img src="@/assets/3.png" alt="icon" class="small-icon"> <!-- 小图片的位置 -->
-        <h2>Harnessing Multispectral Imaging and Deep
-          Learning for Precision Agriculture:<br/><br/>
-          The DPIRD AgriVision</h2>
-      </div>
+      <img src="@/assets/7.png" alt="image" class="field-image">
     </div>
     <div class="intro-text">
       <p>
@@ -52,21 +46,9 @@
   }
 
   .field-image {
-    width: 60%; /* Adjust the width as needed */
+    width: 95%; /* Adjust the width as needed */
     height: auto;
     margin-right: 20px;
-  }
-
-  .field-text {
-    max-width: 30%;
-    text-align: left;
-  }
-
-  .field-text .small-icon {
-    display: block;
-    margin-bottom: 20px; /* Adjust spacing as needed */
-    width: 100%; /* Adjust the width as needed */
-    height: auto;
   }
 
   .field-text h2 {

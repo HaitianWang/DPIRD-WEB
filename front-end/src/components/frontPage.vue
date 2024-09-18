@@ -1,7 +1,7 @@
 <template>
   <div class="login-container">
     <el-form ref="loginForm" label-width="80px" class="login-box">
-      <h3 class="login-title">UWAIntelliCrop</h3>
+      <h3 class="login-title">DPIRDAgriVision</h3>
       <el-form-item label="username" prop="username">
         <el-input type="text" placeholder="please enter username" v-model="username"/>
       </el-form-item>
@@ -33,6 +33,11 @@ export default {
       pwd: "",
       server_url: "http://127.0.0.1:5003"
     }
+  },
+  created: function () {
+    document.title = "DPIRD AgriVision";
+    this.$emit('header', false);
+    this.$emit('footer', false);
   },
   methods: {
     ...mapActions(['login']),
