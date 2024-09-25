@@ -6,6 +6,7 @@ import regiPage from "../components/regiPage";
 import uploadPage from "../components/uploadPage";
 import timeCapsule from "../components/timeCapsule";
 import store from '../store'
+import userPage from "../components/userPage";
 
 Vue.use(Router)
 
@@ -37,6 +38,12 @@ const router = new Router({
       path: '/timeCapsule',
       name: 'timeCapsule',
       component: timeCapsule,
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/userPage',
+      name: 'userPage',
+      component: userPage,
       meta: { requiresAuth: true }
     },
   ]

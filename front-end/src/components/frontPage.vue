@@ -80,7 +80,7 @@ export default {
     justify-content: center;
     align-items: center;
     height: 100vh;
-    background-image: url('~@/assets/6.jpg'); /* 使用 ~@ 以确保路径正确解析 */
+    background-image: url('~@/assets/8.jpg'); /* 使用 ~@ 以确保路径正确解析 */
     background-size: cover;
     background-position: center;
   }

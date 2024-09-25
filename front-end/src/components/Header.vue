@@ -1,10 +1,16 @@
 <template>
   <div id="Header">
     <div class="top-left-edition">
-      <span class="user-info">
-        <i class="el-icon-user" style="font-size: 23px"></i>
-        <span id="name">{{ username }}</span>
-      </span>
+      <el-dropdown trigger="hover" class="custom-dropdown">
+        <span class="el-dropdown-link user-info">
+          <i class="el-icon-user" style="font-size: 23px"></i>
+          <span id="name">{{ username }}</span>
+        </span>
+        <el-dropdown-menu slot="dropdown" class="custom-dropdown-menu">
+          <el-dropdown-item @click.native="goUserPage" class="custom-dropdown-item">Change Password</el-dropdown-item>
+          <el-dropdown-item divided @click.native="goFrontPage" class="custom-dropdown-item">Exit</el-dropdown-item>
+        </el-dropdown-menu>
+      </el-dropdown>
     </div>
     <nav class="middle">
       <router-link to="/uploadPage" class="nav-link">Upload</router-link>
@@ -44,6 +50,12 @@
       goMainPage() {
         this.$router.push('/mainPage');
       },
+      goUserPage(){
+        this.$router.push({
+          path: "/userPage",
+          name: "userPage",
+        });
+      }
     },
   };
 </script>
@@ -56,8 +68,8 @@
     padding: 0px 40px;
     width: 90%;
     margin: 10px auto;
-    background-color: #36471f; /* 绿色背景#6ec2b1 */
-    color: white; /* 白色文字 */
+    background-color: #36471f;
+    color: white;
   }
 
   #word {
@@ -67,10 +79,10 @@
   }
 
   h1 {
-    color: white; /* 确保标题也是白色 */
+    color: white;
     letter-spacing: 1px;
     font-size: 1.8em;
-    margin-right: 10px; /* 确保图标与文字有间距 */
+    margin-right: 10px;
   }
 
   .el-menu-demo {
@@ -79,36 +91,46 @@
     padding: 0px;
   }
 
-  .top-left-edition .user-info {
+  .user-info {
     font-size: 20px;
     color: white;
     line-height: 24px;
-    margin-right: 10px;
+    cursor: pointer;
   }
 
   #name {
-    margin-right: 3px;
+    margin-left: 5px;
   }
 
   .nav-link {
     margin: 0 15px;
-    text-decoration: none; /* 去掉下划线 */
+    text-decoration: none;
     font-size: 20px;
-    color: white; /* 确保导航链接也是白色 */
+    color: white;
   }
 
   .nav-link:hover {
-    text-decoration: none; /* 保持悬停时无下划线 */
-    color: #d9f0ea; /* 悬停时稍微变亮的颜色，可选 */
+    color: #d9f0ea;
   }
 
   .home-icon {
-    font-size: 30px; /* 调整图标大小 */
+    font-size: 30px;
     cursor: pointer;
-    color: white; /* 确保图标也是白色 */
+    color: white;
   }
 
   .home-icon:hover {
-    color: #d9f0ea; /* 悬停时稍微变亮的颜色，可选 */
+    color: #d9f0ea;
   }
+
+  /* Custom styles for dropdown menu */
+  .custom-dropdown-menu {
+    margin-left: 50px;
+  }
+
+  .custom-dropdown-item {
+    color: black;
+    font-family: "Helvetica Neue";
+  }
+
 </style>

@@ -66,7 +66,7 @@
     </div>
 
     <!-- Analysis Section -->
-    <div id="info_patient" style="width: 100%;">
+    <div id="info_weed" style="width: 100%;">
       <el-card style="border-radius: 8px">
         <div slot="header" class="clearfix">
           <span>Analysis</span>
@@ -100,7 +100,7 @@
         </el-tabs>
       </el-card>
     </div>
-      <div id="info_patient2" style="width: 100%;">
+      <div id="info_weed2" style="width: 100%;">
         <!-- Suggestions Section -->
         <el-card style="border-radius: 8px; margin-bottom: 20px;">
           <div slot="header" class="clearfix">
@@ -348,24 +348,6 @@
     padding: 0;
   }
 
-  .image-navigation {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 10px;
-  }
-
-  .dialog_info {
-    margin: 20px auto;
-  }
-
-  .text {
-    font-size: 14px;
-  }
-
-  .item {
-    margin-bottom: 18px;
-  }
-
   .clearfix:before,
   .clearfix:after {
     display: table;
@@ -418,7 +400,7 @@
     height: 30px;
     width: 275px;
     text-align: center;
-    background-color: #36471f;
+    background-color: #6ec2b1;
     line-height: 30px;
   }
 
@@ -442,30 +424,6 @@
     text-align: center;
   }
 
-  .block-sidebar {
-    position: fixed;
-    display: none;
-    left: 50%;
-    margin-left: 600px;
-    top: 350px;
-    width: 60px;
-    z-index: 99;
-  }
-
-  .block-sidebar .block-sidebar-item {
-    font-size: 50px;
-    color: lightblue;
-    text-align: center;
-    line-height: 50px;
-    margin-bottom: 20px;
-    cursor: pointer;
-    display: block;
-  }
-
-  .block-sidebar .block-sidebar-item:hover {
-    color: #187aab;
-  }
-
   .download_bt {
     padding: 10px 16px !important;
   }
@@ -479,37 +437,7 @@
     width: 100%;
   }
 
-  .divider {
-    background-color: #eaeaea !important;
-    height: 2px !important;
-    width: 100%;
-    margin-bottom: 50px;
-  }
-
-  .divider_1 {
-    background-color: #ffffff;
-    height: 2px !important;
-    width: 100%;
-    margin-bottom: 20px;
-    margin: 20px auto;
-  }
-
-  .steps {
-    font-family: "lucida grande", "lucida sans unicode", lucida, helvetica,
-    "Hiragino Sans GB", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif;
-    color: #21b3b9;
-    text-align: center;
-    margin: 15px auto;
-    font-size: 20px;
-    font-weight: bold;
-    text-align: center;
-  }
-
-  .step_1 {
-    margin: 20px 26px;
-  }
-
-  #info_patient {
+  #info_weed {
     width: 100%;
   }
 
@@ -518,10 +446,9 @@
     font-size: 14px;
     text-align: center;
     line-height: 250px;
-    /* Adjust this value to vertically center the text */
   }
 
-  #info_patient2 {
+  #info_weed2 {
     margin-top: 20px;
     text-align: left;
   }
