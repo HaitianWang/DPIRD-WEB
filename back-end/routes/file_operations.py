@@ -24,16 +24,23 @@ def upload_file():
 
     if file and allowed_file(file.filename):
         filename = secure_filename(file.filename)
+        print("filename", filename)
         zip_name = filename.rsplit('.', 1)[0]  # 获取文件名，不包括扩展名
-        output_folder = os.path.join('./tmp/ct', zip_name)  # 文件夹位置
+        print("zip_name", zip_name)
+        #output_folder = os.path.join('./tmp/ct', zip_name)  # 文件夹位置
         src_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
         file.save(src_path)
 
-        # 创建文件夹
-        if not os.path.exists(output_folder):
-            os.makedirs(output_folder)
+        # 解压 ZIP 文件
+        with zipfile.ZipFile(src_path, 'r') as zip_ref:
+            zip_ref.extractall('./tmp/ct')
+
+        folder_name = get_single_folder_name_from_zip(src_path)
+        print("folder_name", folder_name)
+        output_folder = os.path.join('./tmp/ct', folder_name)
 
         print("src_path, output_folder",src_path, output_folder)
+
         # 调用 process_indices.py 中的函数，处理图像并计算指数，并保存到 output_folder
         process_zip_and_calculate_indices(src_path, output_folder)
 
@@ -115,3 +122,18 @@ def analyze_text(text):
 
     except Exception as e:
         return f"Error: {str(e)}"
+
+def get_single_folder_name_from_zip(zip_file_path):
+    # 用于存储文件夹名称
+    folder_name = None
+
+    # 打开 ZIP 文件
+    with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
+        # 遍历 ZIP 文件中的所有条目
+        for file_info in zip_ref.infolist():
+            # 如果是文件夹且尚未设置 folder_name，则记录其名称
+            if file_info.is_dir():
+                folder_name = os.path.basename(os.path.normpath(file_info.filename))
+                break  # 只处理第一个文件夹，假设只有一个文件夹
+
+    return folder_name

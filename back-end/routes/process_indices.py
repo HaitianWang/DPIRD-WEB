@@ -5,13 +5,10 @@ import rasterio
 
 # 提取并处理上传的 zip 文件
 def process_zip_and_calculate_indices(zip_file_path, output_folder):
+    print("zip_file_path, output_folder", zip_file_path, output_folder)
     # 创建输出文件夹
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)
-
-    # 解压 ZIP 文件
-    with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
-        zip_ref.extractall('./tmp/ct')
 
     # 定义初始变量
     blue, green, red, nir, re = None, None, None, None, None
