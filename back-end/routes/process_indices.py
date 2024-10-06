@@ -1,55 +1,86 @@
+# This script is designed to process a zip file containing multispectral images and calculate various vegetation indices from those images.
+# It includes the following main steps:
+# 1. Extract the uploaded zip file to a specified folder.
+# 2. Identify and load specific image bands such as Blue, Green, Red, Near-Infrared (NIR), and Red-Edge.
+# 3. Calculate a set of vegetation indices (e.g., NDVI, GNDVI, SAVI, etc.) based on the loaded image bands.
+# 4. Save the calculated indices as .tif files in the output folder for further analysis or use.
+
+
 import os
 import zipfile
 import numpy as np
 import rasterio
 
-# 提取并处理上传的 zip 文件
+# Extract and process the uploaded zip file, calculating vegetation indices from the extracted images.
 def process_zip_and_calculate_indices(zip_file_path, output_folder):
+    """
+    Processes a zip file containing multispectral images, extracts it, and calculates vegetation indices.
+
+    Parameters:
+    zip_file_path (str): Path to the zip file containing the images.
+    output_folder (str): Path to the folder where extracted images and processed indices will be stored.
+
+    Returns:
+    None
+    """
     print("zip_file_path, output_folder", zip_file_path, output_folder)
-    # 创建输出文件夹
+    # Create output folder if it doesn't exist
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)
 
-    # 定义初始变量
+    # Define variables for image bands
     blue, green, red, nir, re = None, None, None, None, None
 
-    # 遍历解压文件，查找并读取图像
+    # Traverse extracted files and read images based on band type
     for root, dirs, files in os.walk(output_folder):
         for file in files:
             file_path = os.path.join(root, file)
-            if "Blue" in file:  # 使用“Blue”来匹配
+            if "Blue" in file:
                 blue = rasterio.open(file_path).read(1)
-            elif "Green" in file:  # 使用“Green”来匹配
+            elif "Green" in file:
                 green = rasterio.open(file_path).read(1)
-            elif "Red_" in file and "RedEdge" not in file:  # 使用“Red”来匹配红光波段
+            elif "Red_" in file and "RedEdge" not in file:
                 red = rasterio.open(file_path).read(1)
-            elif "NIR" in file:  # 使用“NIR”来匹配
+            elif "NIR" in file:
                 nir = rasterio.open(file_path).read(1)
-            elif "RedEdge" in file:  # 使用“RedEdge”来匹配
+            elif "RedEdge" in file:
                 re = rasterio.open(file_path).read(1)
-            elif "RGB" in file:  # 如果找到 RGB tif 图像，不做任何处理，直接跳过
+            elif "RGB" in file:
                 print(f"RGB image found: {file_path}, no processing required.")
                 continue
 
-    # 确保所有必需的波段图像都存在
+    # Ensure all required image bands are loaded
     if any([blue is None, green is None, red is None, nir is None, re is None]):
         raise ValueError("One or more required images (blue, green, red, nir, re) are missing!")
 
-    # 计算指数
+    # Calculate vegetation indices
     indices = calculate_indices(blue, green, red, nir, re)
 
-    # 假设你有一个 profile，用于保存 .tif 文件
+    # Assume a profile to save .tif files
     profile = {
-        'crs': rasterio.crs.CRS.from_epsg(4326),  # 示例 CRS，你需要根据实际情况调整
-        'transform': rasterio.transform.from_origin(0, 0, 1, 1),  # 示例 transform，根据实际情况调整
+        'crs': rasterio.crs.CRS.from_epsg(4326),  # Example CRS, adjust as needed
+        'transform': rasterio.transform.from_origin(0, 0, 1, 1),  # Example transform, adjust as needed
     }
 
-    # 保存计算的指数为 .tif 文件
-    hor, cor = 1, 1  # 示例值，你可以根据实际情况替换
+    # Save calculated indices as .tif files
+    hor, cor = 1, 1  # Example values, replace with actual values if available
     save_indices_as_tif(indices, output_folder, hor, cor, profile)
 
-# 计算指数的函数保持不变
+# Calculate various vegetation indices from the multispectral bands
 def calculate_indices(blue, green, red, nir, re):
+    """
+    Calculates multiple vegetation indices from the given image bands.
+
+    Parameters:
+    blue (numpy array): The blue band image.
+    green (numpy array): The green band image.
+    red (numpy array): The red band image.
+    nir (numpy array): The near-infrared (NIR) band image.
+    re (numpy array): The red-edge band image.
+
+    Returns:
+    dict: A dictionary of calculated vegetation indices.
+    """
     indices = {}
 
     # Green Normalized Difference Vegetation Index (GNDVI)
@@ -115,8 +146,21 @@ def calculate_indices(blue, green, red, nir, re):
 
     return indices
 
-# 保存计算出来的指数为 .tif 文件
+# Save the calculated indices as .tif files
 def save_indices_as_tif(indices, folder_path, hor, cor, profile):
+    """
+    Saves the calculated vegetation indices as .tif files.
+
+    Parameters:
+    indices (dict): Dictionary of vegetation indices to save.
+    folder_path (str): Path to the folder where the files will be saved.
+    hor (int): Horizontal coordinate or identifier.
+    cor (int): Vertical coordinate or identifier.
+    profile (dict): Profile for the output .tif files including CRS and transform.
+
+    Returns:
+    None
+    """
     for index_name, index_data in indices.items():
         tif_path = os.path.join(folder_path, f'{index_name}_{hor}_{cor}.tif')
         with rasterio.open(

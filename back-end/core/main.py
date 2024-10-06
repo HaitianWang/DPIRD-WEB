@@ -1,20 +1,22 @@
+# This script processes multi-spectral data for DPIRD Intellicrop, specifically focused on generating predictions and visualizing results.
+# The steps include:
+# 1. Reducing the number of channels in the input data as needed.
+# 2. Converting image arrays to RGB format for easier visualization.
+# 3. Applying a custom colormap to display predictions, where red represents weeds, green represents vegetation, and white represents neutral areas.
+# 4. Calculating the distribution of these colors in the predicted mask.
+# 5. Saving the original and predicted images for analysis.
+# The code also handles model predictions and generates a unique identifier for each prediction.
+
 from core import process
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-#import rasterio
-#import tensorflow as tf
 import matplotlib.colors as mcolors
 import io
 from PIL import Image
 import uuid
 import matplotlib
-#from sklearn.model_selection import train_test_split
-#from tensorflow.keras.layers import Conv2D, Input
-#from tensorflow.keras.models import Model
 
-# Assuming process is an external module that you import
-# from core import process
 
 def reduce_channels(X, channels_to_keep=13):
     """
